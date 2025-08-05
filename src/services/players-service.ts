@@ -1,5 +1,6 @@
+import { PlayerModel } from "../models/player-model";
 import * as playersRepository from "../repositories/players-repository";
-import { noContent, ok } from "../utils/http-helpers";
+import * as HttpResponse from "../utils/http-helpers";
 
 export const getPlayerService = async () => {
     const data = await playersRepository.findAllPlayers();
@@ -7,10 +8,48 @@ export const getPlayerService = async () => {
     let response = null;
 
     if(data) {
-        response = ok(data);
+        response = HttpResponse.ok(data);
     } else {
-        response = noContent();
+        response = HttpResponse.noContent();
     }
+
+    return response;
+}
+
+export const getPlayerbyIdService = async (id: number) => {
+    const data = await playersRepository.findPlayerById(id);
+
+    let response = null;
+
+    if(data) {
+        response = HttpResponse.ok(data)
+    } else {
+        response = HttpResponse.noContent();
+    }
+
+    return response;
+}
+
+export const createPlayerService = async (player: PlayerModel) => {
+    let response = null;
+
+    if(player !== undefined) {
+        await playersRepository.insertPlayer(player);
+
+        response = HttpResponse.created();
+    }else {
+        response = HttpResponse.badRequest();
+    }
+
+    return response;
+}
+
+export const deletePlayerService = async (id: number) => {
+    let response = null;
+
+    await playersRepository.deleteOnePlayer(id);
+
+    response = HttpResponse.ok({ message: "Deleted" });
 
     return response;
 }
