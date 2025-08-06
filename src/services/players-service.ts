@@ -46,15 +46,28 @@ export const createPlayerService = async (player: PlayerModel) => {
 }
 
 export const updatePlayerService = async (id: number, statistics: PlayerStatisticsmodel) => {
+    const data = await playersRepository.findAndModifyPlayer(id, statistics);
 
+    let response = null;
+
+    if(data === undefined) {
+        response = HttpResponse.badRequest();
+    } else {
+        response = HttpResponse.ok(data)
+    }
+
+    return response;
 }
 
 export const deletePlayerService = async (id: number) => {
     let response = null;
+    const isDeleted = await playersRepository.deleteOnePlayer(id);
 
-    await playersRepository.deleteOnePlayer(id);
-
-    response = HttpResponse.ok({ message: "Deleted" });
+    if(isDeleted) {
+        response = HttpResponse.ok({ message: "Deleted" });
+    } else {
+        response = HttpResponse.badRequest();
+    }
 
     return response;
 }
